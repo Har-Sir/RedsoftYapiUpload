@@ -7,5 +7,5 @@ package com.github.aqiu202.ideayapi.parser.base;
  **/
 public interface ResultConvert<T> {
 
-    T convert();
+    T convert(String prefixPath);
 }

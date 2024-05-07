@@ -13,6 +13,7 @@ import com.github.aqiu202.ideayapi.parser.support.YApiSupportHolder;
 import com.github.aqiu202.ideayapi.upload.YApiUpload;
 import com.github.aqiu202.ideayapi.util.CollectionUtils;
 import com.github.aqiu202.ideayapi.util.NotificationUtils;
+import com.github.aqiu202.ideayapi.util.PropertiesReader;
 import com.github.aqiu202.ideayapi.util.StringUtils;
 import com.intellij.notification.NotificationListener.UrlOpeningListener;
 import com.intellij.notification.NotificationType;
@@ -20,6 +21,10 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.impl.file.PsiFileImplUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -53,13 +58,34 @@ public class YApiUploadAction extends AnAction {
                         NotificationType.ERROR).notify(project);
                 return;
             }
+            String prefixPath = "";
+            PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
+            if(psiFile != null){
+                //Messages.showInfoMessage(psiFile.getName() , psiFile.getText());
+                VirtualFile virtualFile = psiFile.getVirtualFile();
+                if(virtualFile != null){
+                    String filePath =  virtualFile.getPath();
+                    //Messages.showInfoMessage(virtualFile.getName() ,filePath);
+                    if (filePath.contains("src/main/java")) {
+                        int index = filePath.indexOf("src/main/java");
+                        filePath = filePath.substring(0, index);
+                        filePath = filePath + "src/main/resources/yapi.properties";
+                        Map<String,String> map = PropertiesReader.read(filePath);
+                        prefixPath = map.getOrDefault("yapi.setting.url.prefix","");
+                        //Messages.showInfoMessage(virtualFile.getName() + "读取配置" ,prefixPath);
+                    }
+                }
+            }
+
+
+
             PsiMethodParser methodParser = new PsiMethodParserImpl(property, project);
             //获得api 需上传的接口列表 参数对象
             Set<YApiParam> yApiParams = new YApiParser(project, methodParser).parse(e);
             if (CollectionUtils.isNotEmpty(yApiParams)) {
                 Set<YApiSaveParam> allSaveParams = new HashSet<>();
                 for (YApiParam yApiParam : yApiParams) {
-                    allSaveParams.addAll(yApiParam.convert());
+                    allSaveParams.addAll(yApiParam.convert(prefixPath));
                 }
                 this.setDefaultInfo(allSaveParams, token);
                 Map<String, Set<YApiSaveParam>> groupedParams = allSaveParams.stream().filter(param -> StringUtils.isNotBlank(param.getMenu()))

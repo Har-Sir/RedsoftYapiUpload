@@ -269,12 +269,12 @@ public class YApiParam implements Serializable, ResultConvert<Collection<YApiSav
 
 
     @Override
-    public Set<YApiSaveParam> convert() {
+    public Set<YApiSaveParam> convert(String prefixPath) {
         Set<YApiSaveParam> result = new LinkedHashSet<>();
         for (String path : this.paths) {
             result.add(Builders.of(YApiSaveParam::new)
                     .with(YApiSaveParam::setMethod, this.method)
-                    .with(YApiSaveParam::setPath, path)
+                    .with(YApiSaveParam::setPath, prefixPath + path)
                     .with(YApiSaveParam::setMenu, this.menu)
                     .with(YApiSaveParam::setMenuDesc, this.menuDesc)
                     .with(YApiSaveParam::setTitle, this.title)
