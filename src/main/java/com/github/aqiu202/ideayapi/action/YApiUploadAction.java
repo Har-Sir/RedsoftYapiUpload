@@ -59,6 +59,7 @@ public class YApiUploadAction extends AnAction {
                 return;
             }
             String prefixPath = "";
+            String catId = null;
             PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
             if(psiFile != null){
                 //Messages.showInfoMessage(psiFile.getName() , psiFile.getText());
@@ -72,6 +73,7 @@ public class YApiUploadAction extends AnAction {
                         filePath = filePath + "src/main/resources/yapi.properties";
                         Map<String,String> map = PropertiesReader.read(filePath);
                         prefixPath = map.getOrDefault("yapi.setting.url.prefix","");
+                        catId = map.getOrDefault("yapi.setting.catId",null);
                         //Messages.showInfoMessage(virtualFile.getName() + "读取配置" ,prefixPath);
                     }
                 }
@@ -94,6 +96,8 @@ public class YApiUploadAction extends AnAction {
                     Set<YApiSaveParam> params = entry.getValue();
                     for (YApiSaveParam param : params) {
                         try {
+                            // 设置模块id
+                            param.setCatid(catId);
                             // 上传
                             YApiResponse yapiResponse = new YApiUpload()
                                     .uploadSave(property, param, project.getBasePath());
