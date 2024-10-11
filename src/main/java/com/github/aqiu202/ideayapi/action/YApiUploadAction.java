@@ -20,13 +20,19 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.file.PsiFileImplUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -61,13 +67,14 @@ public class YApiUploadAction extends AnAction {
             }
             String prefixPath = "";
             String catId = null;
-            PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
-            if(psiFile != null){
-                //Messages.showInfoMessage(psiFile.getName() , psiFile.getText());
-                VirtualFile virtualFile = psiFile.getVirtualFile();
-                if(virtualFile != null){
+            VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+            if(project != null && virtualFile != null){
+                //Messages.showInfoMessage(virtualFile.getPath() , "提示");
+                // 获取当前打开文件的VirtualFile对象
+                //PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
+                //if(virtualFile != null){
                     String filePath =  virtualFile.getPath();
-                    //Messages.showInfoMessage(virtualFile.getName() ,filePath);
+                    //Messages.showInfoMessage(virtualFile.getName() , filePath);
                     if (filePath.contains("src/main/java")) {
                         int index = filePath.indexOf("src/main/java");
                         filePath = filePath.substring(0, index);
@@ -83,10 +90,15 @@ public class YApiUploadAction extends AnAction {
                         property.setToken(token);
                         property.setUrl(yapiUrl);
                         property.setProjectId(projectId);
-                        Messages.showInfoMessage(virtualFile.getName() + "读取配置" ,
-                                String.format("自定义配置：\n   url:%s \n project:%s \n token:%s \n prefix:%s \n catId:%s \n", yapiUrl, projectId, token, prefixPath, catId));
+
+
+                        NotificationUtils.createNotification("自定义配置信息", String.format("自定义配置：\n   url:%s \n project:%s \n token:%s \n prefix:%s \n catId:%s \n", yapiUrl, projectId, token, prefixPath, catId),
+                                NotificationType.INFORMATION).notify(project);
                     }
-                }
+                //}
+
+            }else {
+                return;
             }
 
 
