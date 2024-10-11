@@ -74,6 +74,11 @@ public class YApiUploadAction extends AnAction {
                         Map<String,String> map = PropertiesReader.read(filePath);
                         prefixPath = map.getOrDefault("yapi.setting.url.prefix","");
                         catId = map.getOrDefault("yapi.setting.catId",null);
+                        token = map.getOrDefault("yapi.setting.token", token);
+                        projectId = Integer.parseInt(map.getOrDefault("yapi.setting.projectId","" + projectId));
+
+                        property.setToken(token);
+                        property.setProjectId(projectId);
                         //Messages.showInfoMessage(virtualFile.getName() + "读取配置" ,prefixPath);
                     }
                 }
@@ -97,7 +102,9 @@ public class YApiUploadAction extends AnAction {
                     for (YApiSaveParam param : params) {
                         try {
                             // 设置模块id
-                            param.setCatid(catId);
+                            if(catId != null){
+                                param.setCatid(catId);
+                            }
                             // 上传
                             YApiResponse yapiResponse = new YApiUpload()
                                     .uploadSave(property, param, project.getBasePath());
