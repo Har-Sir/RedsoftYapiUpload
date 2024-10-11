@@ -51,6 +51,7 @@ public class YApiUploadAction extends AnAction {
             // 项目ID
             int projectId = property.getProjectId();
             // yapi地址
+            // yapi地址
             String yapiUrl = property.getUrl();
             // 配置校验
             if (StringUtils.isEmpty(token) || StringUtils.isEmpty(yapiUrl) || projectId <= 0) {
@@ -72,14 +73,18 @@ public class YApiUploadAction extends AnAction {
                         filePath = filePath.substring(0, index);
                         filePath = filePath + "src/main/resources/yapi.properties";
                         Map<String,String> map = PropertiesReader.read(filePath);
+                        yapiUrl = map.getOrDefault("yapi.setting.url", yapiUrl);
                         prefixPath = map.getOrDefault("yapi.setting.url.prefix","");
                         catId = map.getOrDefault("yapi.setting.catId",null);
                         token = map.getOrDefault("yapi.setting.token", token);
                         projectId = Integer.parseInt(map.getOrDefault("yapi.setting.projectId","" + projectId));
 
+                        property.setUrl(token);
                         property.setToken(token);
+                        property.setUrl(yapiUrl);
                         property.setProjectId(projectId);
-                        //Messages.showInfoMessage(virtualFile.getName() + "读取配置" ,prefixPath);
+                        Messages.showInfoMessage(virtualFile.getName() + "读取配置" ,
+                                String.format("自定义配置：\n   url:%s \n project:%s \n token:%s \n prefix:%s \n catId:%s \n", yapiUrl, projectId, token, prefixPath, catId));
                     }
                 }
             }

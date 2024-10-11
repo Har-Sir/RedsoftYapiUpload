@@ -3,7 +3,8 @@ plugins {
     id 'org.jetbrains.intellij' version '1.17.3'
 }
 group 'com.github.aqiu202.ideayapi'
-version '2.2.3'
+//version '2.2.3'
+version '2.2.4'
 
 repositories {
     maven{
@@ -48,7 +49,8 @@ intellij {
 //    version = '2021.1'
 //    version = '2022.1'
 //    version = '2023.1'
-    version = '2023.2'
+//    version = '2023.2'
+    version = '2024.1'
     type = 'IU'
     plugins = ["java"]
     updateSinceUntilBuild = false
